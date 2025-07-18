@@ -1,0 +1,119 @@
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- GUI setup
+local gui = Instance.new("ScreenGui")
+gui.Name = "PetAutoAgeGUI"
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
+
+-- Frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 240, 0, 140)
+frame.Position = UDim2.new(0.05, 0, 0.6, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+title.BorderSizePixel = 0
+title.Text = "🐾 Pet Auto Age [50]"
+title.Font = Enum.Font.GothamBold
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextSize = 18
+title.Parent = frame
+
+-- Status Label
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -20, 0, 30)
+status.Position = UDim2.new(0, 10, 0, 40)
+status.BackgroundTransparency = 1
+status.Text = "Holding: None"
+status.Font = Enum.Font.Gotham
+status.TextColor3 = Color3.new(1, 1, 1)
+status.TextScaled = true
+status.Parent = frame
+
+-- Button
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(1, -20, 0, 35)
+button.Position = UDim2.new(0, 10, 0, 85)
+button.BackgroundColor3 = Color3.fromRGB(90, 160, 90)
+button.BorderSizePixel = 0
+button.Text = "Age to 50"
+button.Font = Enum.Font.GothamBold
+button.TextColor3 = Color3.new(1, 1, 1)
+button.TextSize = 18
+button.Parent = frame
+
+-- Function to get held tool
+local function getHeldTool()
+	local char = player.Character
+	if not char then return nil end
+	for _, item in ipairs(char:GetChildren()) do
+		if item:IsA("Tool") then
+			return item
+		end
+	end
+	return nil
+end
+
+-- Function to rename tool
+local function renameToolWithAge(tool)
+	local name = tool.Name
+	if string.find(name, "%[Age:? ?%d+%]") then
+		name = name:gsub("%[Age:? ?%d+%]", "[Age: 50]")
+	else
+		name = name .. " [Age: 50]"
+	end
+	tool.Name = name
+end
+
+-- Update tool display
+task.spawn(function()
+	while true do
+		local tool = getHeldTool()
+		if tool then
+			status.Text = "Holding: " .. tool.Name
+		else
+			status.Text = "Holding: None"
+		end
+		wait(0.3)
+	end
+end)
+
+-- Button behavior
+local running = false
+
+button.MouseButton1Click:Connect(function()
+	if running then return end
+
+	local tool = getHeldTool()
+	if not tool then
+		status.Text = "❌ No tool held!"
+		return
+	end
+
+	running = true
+	button.Text = "Aging..."
+	button.BackgroundColor3 = Color3.fromRGB(180, 130, 50)
+	button.Active = false
+
+	for i = 50, 1, -1 do
+		button.Text = "Aging... " .. i .. "s"
+		wait(1)
+	end
+
+	renameToolWithAge(tool)
+
+	status.Text = "✅ Tool is now [Age: 50]"
+	button.Text = "Age to 50"
+	button.BackgroundColor3 = Color3.fromRGB(90, 160, 90)
+	button.Active = true
+	running = false
+end)
