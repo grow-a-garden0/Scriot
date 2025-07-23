@@ -1,6 +1,10 @@
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+-- Settings
+local TARGET_AGE = 100
+local COUNTDOWN_SECONDS = 25
+
 -- GUI setup
 local gui = Instance.new("ScreenGui")
 gui.Name = "PetAutoAgeGUI"
@@ -22,7 +26,7 @@ local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 title.BorderSizePixel = 0
-title.Text = "🐾 Pet Auto Age [50]"
+title.Text = "🐾 Pet Auto Age [" .. TARGET_AGE .. "]"
 title.Font = Enum.Font.GothamBold
 title.TextColor3 = Color3.new(1, 1, 1)
 title.TextSize = 18
@@ -45,7 +49,7 @@ button.Size = UDim2.new(1, -20, 0, 35)
 button.Position = UDim2.new(0, 10, 0, 85)
 button.BackgroundColor3 = Color3.fromRGB(90, 160, 90)
 button.BorderSizePixel = 0
-button.Text = "Age to 50"
+button.Text = "Age to " .. TARGET_AGE
 button.Font = Enum.Font.GothamBold
 button.TextColor3 = Color3.new(1, 1, 1)
 button.TextSize = 18
@@ -63,13 +67,13 @@ local function getHeldTool()
 	return nil
 end
 
--- Function to rename tool
+-- Function to rename tool with age
 local function renameToolWithAge(tool)
 	local name = tool.Name
 	if string.find(name, "%[Age:? ?%d+%]") then
-		name = name:gsub("%[Age:? ?%d+%]", "[Age: 50]")
+		name = name:gsub("%[Age:? ?%d+%]", "[Age: " .. TARGET_AGE .. "]")
 	else
-		name = name .. " [Age: 50]"
+		name = name .. " [Age: " .. TARGET_AGE .. "]"
 	end
 	tool.Name = name
 end
@@ -104,15 +108,15 @@ button.MouseButton1Click:Connect(function()
 	button.BackgroundColor3 = Color3.fromRGB(180, 130, 50)
 	button.Active = false
 
-	for i = 50, 1, -1 do
+	for i = COUNTDOWN_SECONDS, 1, -1 do
 		button.Text = "Aging... " .. i .. "s"
 		wait(1)
 	end
 
 	renameToolWithAge(tool)
 
-	status.Text = "✅ Tool is now [Age: 50]"
-	button.Text = "Age to 50"
+	status.Text = "✅ Tool is now [Age: " .. TARGET_AGE .. "]"
+	button.Text = "Age to " .. TARGET_AGE
 	button.BackgroundColor3 = Color3.fromRGB(90, 160, 90)
 	button.Active = true
 	running = false
