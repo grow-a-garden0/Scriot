@@ -1,123 +1,129 @@
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+-- SERVICES
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local CollectionService = game:GetService("CollectionService")
 
--- Settings
-local TARGET_AGE = 100
-local COUNTDOWN_SECONDS = 25
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
 
--- GUI setup
-local gui = Instance.new("ScreenGui")
-gui.Name = "PetAutoAgeGUI"
+-- GUI SETUP
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "KenshyGUI"
 gui.ResetOnSpawn = false
-gui.Parent = playerGui
+gui.IgnoreGuiInset = true
 
--- Frame
+-- MAIN FRAME
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 240, 0, 140)
-frame.Position = UDim2.new(0.05, 0, 0.6, 0)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.Size = UDim2.new(0, 260, 0, 230) -- Adjusted height for 3 buttons
+frame.Position = UDim2.new(0.5, -130, 0.5, -115)
+frame.BackgroundColor3 = Color3.new(0, 0, 0)
+frame.BackgroundTransparency = 0.3
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
 frame.Parent = gui
 
--- Title
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
-title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-title.BorderSizePixel = 0
-title.Text = "🐾 Pet Auto Age [" .. TARGET_AGE .. "]"
-title.Font = Enum.Font.GothamBold
-title.TextColor3 = Color3.new(1, 1, 1)
-title.TextSize = 18
-title.Parent = frame
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 18)
 
--- Status Label
-local status = Instance.new("TextLabel")
-status.Size = UDim2.new(1, -20, 0, 30)
-status.Position = UDim2.new(0, 10, 0, 40)
-status.BackgroundTransparency = 1
-status.Text = "Holding: None"
-status.Font = Enum.Font.Gotham
-status.TextColor3 = Color3.new(1, 1, 1)
-status.TextScaled = true
-status.Parent = frame
+-- TOP RGB LABEL
+local label = Instance.new("TextLabel", frame)
+label.Size = UDim2.new(1, -40, 0, 30)
+label.Position = UDim2.new(0, 10, 0, 5)
+label.BackgroundTransparency = 1
+label.Text = "Made by: Kenshy"
+label.TextScaled = true
+label.Font = Enum.Font.GothamBold
+label.TextColor3 = Color3.fromRGB(255, 0, 0)
 
--- Button
-local button = Instance.new("TextButton")
-button.Size = UDim2.new(1, -20, 0, 35)
-button.Position = UDim2.new(0, 10, 0, 85)
-button.BackgroundColor3 = Color3.fromRGB(90, 160, 90)
-button.BorderSizePixel = 0
-button.Text = "Age to " .. TARGET_AGE
-button.Font = Enum.Font.GothamBold
-button.TextColor3 = Color3.new(1, 1, 1)
-button.TextSize = 18
-button.Parent = frame
-
--- Function to get held tool
-local function getHeldTool()
-	local char = player.Character
-	if not char then return nil end
-	for _, item in ipairs(char:GetChildren()) do
-		if item:IsA("Tool") then
-			return item
-		end
-	end
-	return nil
-end
-
--- Function to rename tool with age
-local function renameToolWithAge(tool)
-	local name = tool.Name
-	if string.find(name, "%[Age:? ?%d+%]") then
-		name = name:gsub("%[Age:? ?%d+%]", "[Age: " .. TARGET_AGE .. "]")
-	else
-		name = name .. " [Age: " .. TARGET_AGE .. "]"
-	end
-	tool.Name = name
-end
-
--- Update tool display
+-- RGB ANIMATION
 task.spawn(function()
+	local t = 0
 	while true do
-		local tool = getHeldTool()
-		if tool then
-			status.Text = "Holding: " .. tool.Name
-		else
-			status.Text = "Holding: None"
-		end
-		wait(0.3)
+		t += 0.03
+		label.TextColor3 = Color3.fromRGB(
+			math.floor((math.sin(t) + 1) * 127),
+			math.floor((math.sin(t + 2) + 1) * 127),
+			math.floor((math.sin(t + 4) + 1) * 127)
+		)
+		RunService.RenderStepped:Wait()
 	end
 end)
 
--- Button behavior
-local running = false
+-- ❌ CLOSE BUTTON
+local close = Instance.new("TextButton", frame)
+close.Size = UDim2.new(0, 30, 0, 30)
+close.Position = UDim2.new(1, -35, 0, 5)
+close.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+close.Text = "❌"
+close.TextColor3 = Color3.new(1,1,1)
+close.Font = Enum.Font.Gotham
+close.TextScaled = true
 
-button.MouseButton1Click:Connect(function()
-	if running then return end
+-- 🔓 REOPEN BUTTON
+local reopen = Instance.new("TextButton", gui)
+reopen.Size = UDim2.new(0, 60, 0, 30)
+reopen.Position = UDim2.new(0.5, -30, 0.5, 115)
+reopen.BackgroundColor3 = Color3.fromRGB(30,30,30)
+reopen.Text = "🔓 Open"
+reopen.TextColor3 = Color3.new(1,1,1)
+reopen.Font = Enum.Font.Gotham
+reopen.TextScaled = true
+reopen.Visible = false
 
-	local tool = getHeldTool()
-	if not tool then
-		status.Text = "❌ No tool held!"
-		return
-	end
+-- BUTTON 1: Egg Randomizer
+local btn1 = Instance.new("TextButton", frame)
+btn1.Size = UDim2.new(0.9, 0, 0, 40)
+btn1.Position = UDim2.new(0.05, 0, 0, 45)
+btn1.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+btn1.TextColor3 = Color3.new(1,1,1)
+btn1.Font = Enum.Font.GothamBold
+btn1.TextScaled = true
+btn1.Text = "🥚 Egg Randomizer"
 
-	running = true
-	button.Text = "Aging..."
-	button.BackgroundColor3 = Color3.fromRGB(180, 130, 50)
-	button.Active = false
+-- BUTTON 2: Pet Age
+local btn2 = Instance.new("TextButton", frame)
+btn2.Size = UDim2.new(0.9, 0, 0, 40)
+btn2.Position = UDim2.new(0.05, 0, 0, 95)
+btn2.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+btn2.TextColor3 = Color3.new(1,1,1)
+btn2.Font = Enum.Font.GothamBold
+btn2.TextScaled = true
+btn2.Text = "🦝 Pet Age"
 
-	for i = COUNTDOWN_SECONDS, 1, -1 do
-		button.Text = "Aging... " .. i .. "s"
-		wait(1)
-	end
+-- ✅ BUTTON 3: Pet Finder
+local btn3 = Instance.new("TextButton", frame)
+btn3.Size = UDim2.new(0.9, 0, 0, 40)
+btn3.Position = UDim2.new(0.05, 0, 0, 145)
+btn3.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+btn3.TextColor3 = Color3.new(1,1,1)
+btn3.Font = Enum.Font.GothamBold
+btn3.TextScaled = true
+btn3.Text = "🧬 Pet Mutation"
 
-	renameToolWithAge(tool)
+-- Close & reopen logic
+close.MouseButton1Click:Connect(function()
+	frame.Visible = false
+	reopen.Visible = true
+end)
 
-	status.Text = "✅ Tool is now [Age: " .. TARGET_AGE .. "]"
-	button.Text = "Age to " .. TARGET_AGE
-	button.BackgroundColor3 = Color3.fromRGB(90, 160, 90)
-	button.Active = true
-	running = false
+reopen.MouseButton1Click:Connect(function()
+	frame.Visible = true
+	reopen.Visible = false
+end)
+
+-- Load Egg Randomizer
+btn1.MouseButton1Click:Connect(function()
+	loadstring(game:HttpGet("https://pastefy.app/T8btlHBe/raw", true))()
+end)
+
+-- Load Pet Age Script
+btn2.MouseButton1Click:Connect(function()
+	loadstring(game:HttpGet("https://pastefy.app/WGIgVFFf/raw", true))()
+end)
+
+-- Load ESP Finder Script
+btn3.MouseButton1Click:Connect(function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/grow-a-garden0/Scriut/refs/heads/main/Mut", true))()
 end)
