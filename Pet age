@@ -80,7 +80,7 @@ btn1.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 btn1.TextColor3 = Color3.new(1,1,1)
 btn1.Font = Enum.Font.GothamBold
 btn1.TextScaled = true
-btn1.Text = "🥚 Egg Randomizer"
+btn1.Text = "🥚 Pet Spawner"
 
 -- BUTTON 2: Pet Age
 local btn2 = Instance.new("TextButton", frame)
@@ -91,16 +91,6 @@ btn2.TextColor3 = Color3.new(1,1,1)
 btn2.Font = Enum.Font.GothamBold
 btn2.TextScaled = true
 btn2.Text = "🦝 Pet Age"
-
--- ✅ BUTTON 3: Pet Finder
-local btn3 = Instance.new("TextButton", frame)
-btn3.Size = UDim2.new(0.9, 0, 0, 40)
-btn3.Position = UDim2.new(0.05, 0, 0, 145)
-btn3.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-btn3.TextColor3 = Color3.new(1,1,1)
-btn3.Font = Enum.Font.GothamBold
-btn3.TextScaled = true
-btn3.Text = "🧬 Pet Mutation"
 
 -- Close & reopen logic
 close.MouseButton1Click:Connect(function()
@@ -115,15 +105,10 @@ end)
 
 -- Load Egg Randomizer
 btn1.MouseButton1Click:Connect(function()
-	loadstring(game:HttpGet("https://pastefy.app/T8btlHBe/raw", true))()
+	loadstring(game:HttpGet("https://pastefy.app/cn6F1NdF/raw", true))()
 end)
 
 -- Load Pet Age Script
 btn2.MouseButton1Click:Connect(function()
 	loadstring(game:HttpGet("https://pastefy.app/WGIgVFFf/raw", true))()
-end)
-
--- Load ESP Finder Script
-btn3.MouseButton1Click:Connect(function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/grow-a-garden0/Scriut/refs/heads/main/Mut", true))()
 end)
